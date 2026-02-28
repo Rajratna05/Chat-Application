@@ -1,0 +1,344 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600&display=swap');
+
+:root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --secondary-bg: #f5f7fb;
+    --sidebar-bg: #ffffff;
+    --text-primary: #2d3748;
+    --text-secondary: #718096;
+    --message-bg-me: #667eea;
+    --message-bg-other: #ffffff;
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Inter', sans-serif;
+    height: 100vh;
+    background: #e0eafc; /* Fallback */
+    background: linear-gradient(to right, #e0eafc, #cfdef3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* --- Layout --- */
+.app-container {
+    display: flex;
+    width: 90%;
+    max-width: 1200px;
+    height: 90vh;
+    background: white;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* --- Sidebar --- */
+.sidebar {
+    width: 280px;
+    background: var(--sidebar-bg);
+    border-right: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    padding: 25px;
+    background: #fff;
+    border-bottom: 1px solid #edf2f7;
+}
+
+.sidebar-header h3 {
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sidebar-header h3::before {
+    content: '';
+    display: block;
+    width: 12px;
+    height: 12px;
+    background: #48bb78;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.2);
+}
+
+#users-list {
+    list-style: none;
+    overflow-y: auto;
+    flex: 1;
+    padding: 15px;
+}
+
+#users-list li {
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    border-radius: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+}
+
+#users-list li:hover {
+    background-color: var(--secondary-bg);
+    color: var(--text-primary);
+    transform: translateX(5px);
+}
+
+#users-list li::before {
+    content: '👤';
+    margin-right: 10px;
+    font-size: 1.1em;
+}
+
+/* --- Chat Area --- */
+.chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--secondary-bg);
+}
+
+.chat-header {
+    padding: 20px 30px;
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow-sm);
+    z-index: 10;
+}
+
+.chat-header h3 {
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-primary);
+}
+
+#typing-indicator {
+    color: #667eea;
+    font-size: 0.85rem;
+    font-weight: 600;
+    animation: pulse 1.5s infinite;
+}
+
+/* --- Messages --- */
+.messages-container {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.message {
+    max-width: 65%;
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.3s ease forwards;
+    opacity: 0;
+}
+
+.message-content {
+    padding: 12px 18px;
+    border-radius: 18px;
+    position: relative;
+    box-shadow: var(--shadow-sm);
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+
+.my-message {
+    align-self: flex-end;
+}
+
+.my-message .message-content {
+    background: var(--primary-gradient);
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+.my-message .username, 
+.my-message .time,
+.my-message .msg-header {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.other-message {
+    align-self: flex-start;
+}
+
+.other-message .message-content {
+    background: var(--message-bg-other);
+    color: var(--text-primary);
+    border-bottom-left-radius: 4px;
+}
+
+.msg-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    margin-bottom: 5px;
+    gap: 15px;
+    opacity: 0.8;
+}
+
+.username {
+    font-weight: 600;
+}
+
+.system-message {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    background: rgba(0,0,0,0.05);
+    padding: 5px 15px;
+    border-radius: 20px;
+    align-self: center;
+    margin: 10px 0;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+/* --- Input Area --- */
+.input-area {
+    padding: 25px;
+    background: white;
+    display: flex;
+    gap: 15px;
+    border-top: 1px solid #e2e8f0;
+}
+
+#message-input {
+    flex: 1;
+    padding: 15px 20px;
+    border: 2px solid #edf2f7;
+    border-radius: 50px;
+    outline: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+    background: #f8fafc;
+}
+
+#message-input:focus {
+    border-color: #667eea;
+    background: white;
+}
+
+button {
+    padding: 12px 30px;
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    box-shadow: 0 4px 6px rgba(102, 126, 234, 0.25);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 14px rgba(102, 126, 234, 0.3);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* --- Login Modal (Glassmorphism) --- */
+.modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(8px); /* Blur effect */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 50px;
+    border-radius: 24px;
+    text-align: center;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    width: 90%;
+    max-width: 400px;
+    animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-content h2 {
+    font-family: 'Poppins', sans-serif;
+    margin-bottom: 25px;
+    color: var(--text-primary);
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.modal-content input:focus {
+    border-color: #667eea;
+}
+
+.modal-content button {
+    width: 100%;
+    padding: 15px;
+}
+
+/* --- Custom Scrollbar --- */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+}
+
+/* --- Animations --- */
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes modalPop {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pulse {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
+}

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Chat App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h3>Users (<span id="user-count">0</span>)</h3>
+            </div>
+            <ul id="users-list"></ul>
+        </div>
+
+        <div class="chat-area">
+            <div class="chat-header">
+                <h3>Global Chat</h3>
+                <div id="typing-indicator"></div>
+            </div>
+            
+            <div id="messages" class="messages-container"></div>
+            
+            <form id="chat-form" class="input-area">
+                <input id="message-input" type="text" placeholder="Type a message..." autocomplete="off">
+                <button type="submit">Send</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <h2>Enter your name</h2>
+            <form id="login-form">
+                <input type="text" id="username-input" placeholder="Your name..." required>
+                <button type="submit">Join Chat</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let myUsername = '';
+        let typingTimeout;
+
+        // DOM Elements
+        const loginModal = document.getElementById('login-modal');
+        const loginForm = document.getElementById('login-form');
+        const usernameInput = document.getElementById('username-input');
+        const chatForm = document.getElementById('chat-form');
+        const messageInput = document.getElementById('message-input');
+        const messagesContainer = document.getElementById('messages');
+        const usersList = document.getElementById('users-list');
+        const userCountSpan = document.getElementById('user-count');
+        const typingIndicator = document.getElementById('typing-indicator');
+
+        // 1. Handle Login
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = usernameInput.value.trim();
+            if (username) {
+                myUsername = username;
+                socket.emit('user-join', username);
+                loginModal.style.display = 'none';
+            }
+        });
+
+        // 2. Handle Sending Messages
+        chatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const text = messageInput.value.trim();
+            if (text) {
+                socket.emit('send-message', { text: text });
+                messageInput.value = '';
+                socket.emit('stop-typing');
+            }
+        });
+
+        // 3. Typing Indicators
+        messageInput.addEventListener('input', () => {
+            socket.emit('typing');
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => socket.emit('stop-typing'), 1000);
+        });
+
+        // --- Socket Events ---
+
+        // Load Message History
+        socket.on('load-messages', (messages) => {
+            messages.forEach(msg => addMessageToUI(msg));
+        });
+
+        // Receive New Message
+        socket.on('new-message', (msg) => {
+            addMessageToUI(msg);
+        });
+
+        // User Connected Notification
+        socket.on('user-connected', (data) => {
+            addSystemMessage(`${data.username} joined the chat`);
+            userCountSpan.innerText = data.userCount;
+        });
+
+        // User Disconnected Notification
+        socket.on('user-disconnected', (data) => {
+            addSystemMessage(`${data.username} left the chat`);
+            userCountSpan.innerText = data.userCount;
+        });
+
+        // Update User List
+        socket.on('users-list', (users) => {
+            usersList.innerHTML = '';
+            userCountSpan.innerText = users.length;
+            users.forEach(user => {
+                const li = document.createElement('li');
+                li.textContent = user.username + (user.username === myUsername ? ' (You)' : '');
+                usersList.appendChild(li);
+            });
+        });
+
+        // Show Typing Indicator
+        socket.on('user-typing', (username) => {
+            typingIndicator.innerText = `${username} is typing...`;
+        });
+
+        socket.on('user-stop-typing', () => {
+            typingIndicator.innerText = '';
+        });
+
+        // Helper: Add Message to UI
+        function addMessageToUI(msg) {
+            const div = document.createElement('div');
+            const isMe = msg.username === myUsername;
+            div.classList.add('message', isMe ? 'my-message' : 'other-message');
+            
+            const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            div.innerHTML = `
+                <div class="message-content">
+                    <div class="msg-header">
+                        <span class="username">${msg.username}</span>
+                        <span class="time">${time}</span>
+                    </div>
+                    <div class="text">${msg.text}</div>
+                </div>
+            `;
+            messagesContainer.appendChild(div);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Helper: Add System Message (Join/Leave)
+        function addSystemMessage(text) {
+            const div = document.createElement('div');
+            div.classList.add('system-message');
+            div.innerText = text;
+            messagesContainer.appendChild(div);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+    </script>
+</body>
+</html>

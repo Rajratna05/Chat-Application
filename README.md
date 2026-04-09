@@ -1,17 +1,3 @@
-# CHAT APPLICATION
-
-Company Name: CODTECH IT SOLUTIONS
-
-Name: Rajratna Nitin Kamble
-
-Intern ID: CTIS3288
-
-Domain Name: Full Stack Web Development
-
-Batch Duration: 8 Weeks
-
-Mentor Name: Nila Santos
-
 # 💬 Real-Time Chat Application
 
 A modern real-time chat application built with **Socket.IO**, **Node.js**, and vanilla JavaScript. Features instant messaging, live user presence, typing indicators, and a beautiful responsive interface.
